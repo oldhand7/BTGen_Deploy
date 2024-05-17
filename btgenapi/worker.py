@@ -200,7 +200,7 @@ def process_generate(async_task: QueueTask):
 
         steps = 40
         
-        # performance_selection = 'Turbo Speed'
+        performance_selection = 'Extreme Speed'
 
         if performance_selection == 'Speed':
             steps = 40
@@ -227,6 +227,28 @@ def process_generate(async_task: QueueTask):
             patch.negative_adm_scale = advanced_parameters.adm_scaler_negative = 1.0
             patch.adm_scaler_end = advanced_parameters.adm_scaler_end = 0.0
             steps = 8
+        print("performance_selection")
+        print(performance_selection)
+        one = "dreamshaperXL_v21TurboDPMSDE.safetensors"
+        model_name = "https://huggingface.co/Lykon/dreamshaper-xl-turbo/resolve/main/DreamShaperXL_Turbo_dpmppSdeKarras_half_pruned_6.safetensors"
+        light = "juggernautXL_v9Rdphoto2Lightning.safetensors"
+        
+        if performance_selection == 'Turbo Speed':
+            print('Enter SDXL Turbo mode.')
+            progressbar(async_task, 1, 'Downloading SDXL Turbo components ...')
+            # change this to config.py could be better
+            
+            config.load_file_from_url(
+                url='https://huggingface.co/thoth-a1/dreamshaper_XL_Lightning/resolve/main/dreamshaperXL_v21TurboDPMSDE.safetensors',
+                model_dir=config.path_checkpoints,
+                file_name='dreamshaperXL_v21TurboDPMSDE.safetensors'
+            )
+
+            refiner_model_name = 'None'
+            sampler_name = advanced_parameters.sampler_name = 'dpmpp_sde'
+            cfg_scale = guidance_scale = 2.0
+            patch.sharpness = sharpness = 3.0
+            steps = 6
 
         patch.adaptive_cfg = advanced_parameters.adaptive_cfg
         print(f'[Parameters] Adaptive CFG = {patch.adaptive_cfg}')

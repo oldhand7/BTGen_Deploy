@@ -291,7 +291,7 @@ available_aspect_ratios = get_config_item_or_set_default(
     ],
     validator=lambda x: isinstance(x, list) and all('*' in v for v in x) and len(x) > 1
 )
-default_aspect_ratio = "768*1280"
+default_aspect_ratio = "1024*1024"
 default_inpaint_engine_version = get_config_item_or_set_default(
     key='default_inpaint_engine_version',
     default_value='v2.6',
