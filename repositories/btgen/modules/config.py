@@ -446,6 +446,16 @@ def downloading_sdxl_lcm_lora():
     return 'sdxl_lcm_lora.safetensors'
 
 
+def downloading_sdxl_hyper_sd_cfg_lora():
+    load_file_from_url(
+        url='https://huggingface.co/mashb1t/misc/resolve/main/sdxl_hyper_sd_8step_cfg_lora.safetensors',
+        model_dir=path_loras,
+        file_name="sdxl_hyper_sd_8step_cfg_lora.safetensors"
+    )
+    return "sdxl_hyper_sd_8step_cfg_lora.safetensors"
+
+
+
 def downloading_controlnet_canny():
     load_file_from_url(
         url='https://huggingface.co/lllyasviel/misc/resolve/main/control-lora-canny-rank128.safetensors',

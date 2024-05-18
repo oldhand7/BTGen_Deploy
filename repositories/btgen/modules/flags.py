@@ -26,7 +26,7 @@ cn_canny = "PyraCanny"
 cn_cpds = "CPDS"
 
 default_prompt = "  , on a full-length body , separate from image prompt selfies and irrespective of image prompt"
-negative_prompt = ' NSFW, Two-piece, Bikini briefs, Monokini, Tankini, Triangle bikini, Bandeau bikini,Halter-neck bikini, High-waisted bikini, naked,naked, bachelorette, underwearing, underweared, nuke, nudity, bachelor, bottomless, underwear, bikini ,  bikini ,  bikini ,  bikini ,  bikini ,  bikini , topless,underwearing, underweared,underwearing, underweared, sexy, around current clothing, '
+negative_prompt = ' portrait, NSFW, Naked, Nude, NSFW, nake, nude, disfigured, kitsch, ugly, oversaturated, grain, low-res, Deformed, blurry, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long neck, long body, ugly, disgusting, poorly drawn, childish, mutilated, mangled, text, blurry, b&w, monochrome, conjoined twins, multiple heads, extra legs, extra arms, meme, deformed, elongated, twisted fingers, strabismus, closed eyes, blurred, watermark  '
 
 ip_list = [cn_ip, cn_canny, cn_cpds, cn_ip_face]
 default_ip = cn_ip_face

@@ -125,7 +125,7 @@ def process_generate(async_task: QueueTask):
         # Transform parameters
         params = async_task.req_param
 
-        prompt = params.prompt
+        prompt = "(full length:1.3),  shod, " + params.prompt 
         style_selections = params.style_selections
 
         performance_selection = params.performance_selection
@@ -152,7 +152,7 @@ def process_generate(async_task: QueueTask):
         inpaint_additional_prompt = params.inpaint_additional_prompt
         deep_upscale = params.deep_upscale
         inpaint_mask_image_upload = None
-        negative_prompt = ' Two-piece, Bikini briefs, Monokini, Tankini, Triangle bikini, Bandeau bikini,Halter-neck bikini, High-waisted bikini, naked,naked, bachelorette, underwearing, underweared, nuke, nudity, bachelor, bottomless, underwear, bikini ,  bikini ,  bikini ,  bikini ,  bikini ,  bikini , topless,underwearing, underweared,underwearing, underweared, sexy, around current clothing,'
+        negative_prompt = ' (NSFW:1.1), Naked, Nude, NSFW, nake, nude, disfigured, kitsch, ugly, oversaturated, grain, low-res, Deformed, blurry, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long neck, long body, ugly, disgusting, poorly drawn, childish, mutilated, mangled, text, blurry, b&w, monochrome, conjoined twins, multiple heads, extra legs, extra arms, meme, deformed, elongated, twisted fingers, strabismus, closed eyes, blurred, watermark  '
 
         if inpaint_additional_prompt is None:
             inpaint_additional_prompt = ''
@@ -198,12 +198,17 @@ def process_generate(async_task: QueueTask):
 
         assert performance_selection in ['Speed', 'Quality', 'Extreme Speed']
 
-        steps = 40
+        steps = 15
         
-        performance_selection = 'Extreme Speed'
+        performance_selection = 'Speed'
+        print("performance_selection")
+        print(performance_selection)
+        one = "dreamshaperXL_v21TurboDPMSDE.safetensors"
+        model_name = "https://huggingface.co/Lykon/dreamshaper-xl-turbo/resolve/main/DreamShaperXL_Turbo_dpmppSdeKarras_half_pruned_6.safetensors"
+        light = "juggernautXL_v9Rdphoto2Lightning.safetensors"
 
         if performance_selection == 'Speed':
-            steps = 40
+            steps = 15
 
         if performance_selection == 'Quality':
             steps = 60
@@ -227,12 +232,16 @@ def process_generate(async_task: QueueTask):
             patch.negative_adm_scale = advanced_parameters.adm_scaler_negative = 1.0
             patch.adm_scaler_end = advanced_parameters.adm_scaler_end = 0.0
             steps = 8
-        print("performance_selection")
-        print(performance_selection)
-        one = "dreamshaperXL_v21TurboDPMSDE.safetensors"
-        model_name = "https://huggingface.co/Lykon/dreamshaper-xl-turbo/resolve/main/DreamShaperXL_Turbo_dpmppSdeKarras_half_pruned_6.safetensors"
-        light = "juggernautXL_v9Rdphoto2Lightning.safetensors"
+       
         
+        if performance_selection == "HYPER_SD8":
+            print('Enter Hyper-SD8 mode.')
+            progressbar(async_task, 1, 'Downloading Hyper-SD components ...')
+            loras += [(config.downloading_sdxl_hyper_sd_cfg_lora(), 0.3)]
+
+            sampler_name = 'dpmpp_sde_gpu'
+            scheduler_name = 'normal'
+                    
         if performance_selection == 'Turbo Speed':
             print('Enter SDXL Turbo mode.')
             progressbar(async_task, 1, 'Downloading SDXL Turbo components ...')
@@ -459,8 +468,8 @@ def process_generate(async_task: QueueTask):
                 positive_basic_workloads = positive_basic_workloads + task_extra_positive_prompts
                 negative_basic_workloads = negative_basic_workloads + task_extra_negative_prompts
 
-                # positive_basic_workloads = remove_empty_str(positive_basic_workloads, default=task_prompt)
-                positive_basic_workloads = [task_prompt]
+                positive_basic_workloads = remove_empty_str(positive_basic_workloads, default=task_prompt)
+                # positive_basic_workloads = [task_prompt]
                 negative_basic_workloads = remove_empty_str(negative_basic_workloads, default=task_negative_prompt)
                 print("*************************", task_prompt)
                 print("*************************", positive_basic_workloads)
