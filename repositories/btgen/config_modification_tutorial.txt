@@ -15,7 +15,7 @@ Remember to split the paths with "\\" rather than "\", and there is no "," befor
     "path_clip_vision": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/clip_vision",
     "path_btgen_expansion": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/prompt_expansion/btgen_expansion",
     "path_outputs": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/outputs",
-    "default_model": "juggernautXL_v8Rundiffusion.safetensors",
+    "default_model": "JuggernautXRundiffusion_Hyper.safetensors",
     "previous_default_models": [
         "juggernautXL_version8Rundiffusion.safetensors",
         "juggernautXL_version7Rundiffusion.safetensors",
@@ -63,7 +63,7 @@ Remember to split the paths with "\\" rather than "\", and there is no "," befor
     "default_max_image_number": 32,
     "default_image_number": 25,
     "checkpoint_downloads": {
-        "juggernautXL_v8Rundiffusion.safetensors": "https://huggingface.co/lllyasviel/fav_models/resolve/main/fav/juggernautXL_v8Rundiffusion.safetensors"
+        "JuggernautXRundiffusion_Hyper.safetensors": "https://huggingface.co/RunDiffusion/Juggernaut-X-Hyper/resolve/main/JuggernautXRundiffusion_Hyper.safetensors"
     },
     "lora_downloads": {
         "sd_xl_offset_example-lora_1.0.safetensors": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors"

@@ -12,7 +12,14 @@ from btgenapi.parameters import GenerationFinishReason, ImageGenerationResult, d
 from btgenapi.task_queue import QueueTask, TaskQueue, TaskOutputs
 import cv2
 
+from btgenapi.nsfw.nudenet import NudeDetector
 worker_queue: TaskQueue = None
+nudeDetector = None
+
+worker_queue: TaskQueue = None
+
+
+
 
 def process_top():
     import ldm_patched.modules.model_management
@@ -125,7 +132,7 @@ def process_generate(async_task: QueueTask):
         # Transform parameters
         params = async_task.req_param
 
-        prompt = "(full length:1.3),  shod, " + params.prompt 
+        prompt ="(full length:1.4),(clothed:1.3), (best quality:1.2)  shod, " + params.prompt
         style_selections = params.style_selections
 
         performance_selection = params.performance_selection
@@ -152,7 +159,7 @@ def process_generate(async_task: QueueTask):
         inpaint_additional_prompt = params.inpaint_additional_prompt
         deep_upscale = params.deep_upscale
         inpaint_mask_image_upload = None
-        negative_prompt = ' (NSFW:1.1), Naked, Nude, NSFW, nake, nude, disfigured, kitsch, ugly, oversaturated, grain, low-res, Deformed, blurry, bad anatomy, disfigured, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long neck, long body, ugly, disgusting, poorly drawn, childish, mutilated, mangled, text, blurry, b&w, monochrome, conjoined twins, multiple heads, extra legs, extra arms, meme, deformed, elongated, twisted fingers, strabismus, closed eyes, blurred, watermark  '
+        negative_prompt = default_prompt_negative
 
         if inpaint_additional_prompt is None:
             inpaint_additional_prompt = ''
@@ -198,17 +205,12 @@ def process_generate(async_task: QueueTask):
 
         assert performance_selection in ['Speed', 'Quality', 'Extreme Speed']
 
-        steps = 15
+        steps = 6
         
-        performance_selection = 'Speed'
-        print("performance_selection")
-        print(performance_selection)
-        one = "dreamshaperXL_v21TurboDPMSDE.safetensors"
-        model_name = "https://huggingface.co/Lykon/dreamshaper-xl-turbo/resolve/main/DreamShaperXL_Turbo_dpmppSdeKarras_half_pruned_6.safetensors"
-        light = "juggernautXL_v9Rdphoto2Lightning.safetensors"
+        performance_selection = 'HyperSD'
 
         if performance_selection == 'Speed':
-            steps = 15
+            steps = 6
 
         if performance_selection == 'Quality':
             steps = 60
@@ -225,39 +227,34 @@ def process_generate(async_task: QueueTask):
             sampler_name = advanced_parameters.sampler_name = 'lcm'
             scheduler_name = advanced_parameters.scheduler_name = 'lcm'
             patch.sharpness = sharpness = 0.0
+            cfg_scale = guidance_scale = 2.0
+            patch.adaptive_cfg = advanced_parameters.adaptive_cfg = 1.0
+            refiner_switch = 1.0
+            patch.positive_adm_scale = advanced_parameters.adm_scaler_positive = 1.0
+            patch.negative_adm_scale = advanced_parameters.adm_scaler_negative = 1.0
+            patch.adm_scaler_end = advanced_parameters.adm_scaler_end = 0.0
+            steps = 6
+            
+        elif performance_selection == "HyperSD":
+            print('Enter Hyper-SD mode.')
+            progressbar(async_task, 1, 'Downloading Hyper-SD components ...')
+            loras += [(config.downloading_sdxl_hyper_sd_lora(), 0.8)]
+
+            if refiner_model_name != 'None':
+                print(f'Refiner disabled in Hyper-SD mode.')
+            refiner_model_name = 'None'
+            sampler_name = advanced_parameters.sampler_name = 'dpmpp_sde_gpu'
+            scheduler_name = advanced_parameters.scheduler_name = 'karras'
+            patch.sharpness = sharpness = 0.0
             cfg_scale = guidance_scale = 1.0
             patch.adaptive_cfg = advanced_parameters.adaptive_cfg = 1.0
             refiner_switch = 1.0
             patch.positive_adm_scale = advanced_parameters.adm_scaler_positive = 1.0
             patch.negative_adm_scale = advanced_parameters.adm_scaler_negative = 1.0
             patch.adm_scaler_end = advanced_parameters.adm_scaler_end = 0.0
-            steps = 8
-       
-        
-        if performance_selection == "HYPER_SD8":
-            print('Enter Hyper-SD8 mode.')
-            progressbar(async_task, 1, 'Downloading Hyper-SD components ...')
-            loras += [(config.downloading_sdxl_hyper_sd_cfg_lora(), 0.3)]
-
-            sampler_name = 'dpmpp_sde_gpu'
-            scheduler_name = 'normal'
-                    
-        if performance_selection == 'Turbo Speed':
-            print('Enter SDXL Turbo mode.')
-            progressbar(async_task, 1, 'Downloading SDXL Turbo components ...')
-            # change this to config.py could be better
             
-            config.load_file_from_url(
-                url='https://huggingface.co/thoth-a1/dreamshaper_XL_Lightning/resolve/main/dreamshaperXL_v21TurboDPMSDE.safetensors',
-                model_dir=config.path_checkpoints,
-                file_name='dreamshaperXL_v21TurboDPMSDE.safetensors'
-            )
+            
 
-            refiner_model_name = 'None'
-            sampler_name = advanced_parameters.sampler_name = 'dpmpp_sde'
-            cfg_scale = guidance_scale = 2.0
-            patch.sharpness = sharpness = 3.0
-            steps = 6
 
         patch.adaptive_cfg = advanced_parameters.adaptive_cfg
         print(f'[Parameters] Adaptive CFG = {patch.adaptive_cfg}')
@@ -326,10 +323,10 @@ def process_generate(async_task: QueueTask):
                     if 'fast' in uov_method:
                         skip_prompt_processing = True
                     else:
-                        steps = 18
+                        steps = 6
 
                         if performance_selection == 'Speed':
-                            steps = 18
+                            steps = 6
 
                         if performance_selection == 'Quality':
                             steps = 36
@@ -339,50 +336,7 @@ def process_generate(async_task: QueueTask):
 
                     progressbar(async_task, 1, 'Downloading upscale models ...')
                     config.downloading_upscale_model()
-            if (current_tab == 'inpaint' or (
-                    current_tab == 'ip' and advanced_parameters.mixing_image_prompt_and_inpaint)) \
-                    and isinstance(inpaint_input_image, dict):
-                inpaint_image = inpaint_input_image['image']
-                inpaint_mask = inpaint_input_image['mask'][:, :, 0]
 
-                if advanced_parameters.inpaint_mask_upload_checkbox:
-                    if isinstance(inpaint_mask_image_upload, np.ndarray):
-                        if inpaint_mask_image_upload.ndim == 3:
-                            H, W, C = inpaint_image.shape
-                            inpaint_mask_image_upload = resample_image(inpaint_mask_image_upload, width=W, height=H)
-                            inpaint_mask_image_upload = np.mean(inpaint_mask_image_upload, axis=2)
-                            inpaint_mask_image_upload = (inpaint_mask_image_upload > 127).astype(np.uint8) * 255
-                            inpaint_mask = inpaint_mask_image_upload
-
-                if int(advanced_parameters.inpaint_erode_or_dilate) != 0:
-                    inpaint_mask = erode_or_dilate(inpaint_mask, advanced_parameters.inpaint_erode_or_dilate)
-
-                if advanced_parameters.invert_mask_checkbox:
-                    inpaint_mask = 255 - inpaint_mask
-
-                inpaint_image = HWC3(inpaint_image)
-                if isinstance(inpaint_image, np.ndarray) and isinstance(inpaint_mask, np.ndarray) \
-                        and (np.any(inpaint_mask > 127) or len(outpaint_selections) > 0):
-                    progressbar(async_task, 1, 'Downloading upscale models ...')
-                    config.downloading_upscale_model()
-                    if inpaint_parameterized:
-                        progressbar(async_task, 1, 'Downloading inpainter ...')
-                        inpaint_head_model_path, inpaint_patch_model_path = config.downloading_inpaint_models(
-                            advanced_parameters.inpaint_engine)
-                        base_model_additional_loras += [(inpaint_patch_model_path, 1.0)]
-                        print(f'[Inpaint] Current inpaint model is {inpaint_patch_model_path}')
-                        if refiner_model_name == 'None':
-                            use_synthetic_refiner = True
-                            refiner_switch = 0.5
-                    else:
-                        inpaint_head_model_path, inpaint_patch_model_path = None, None
-                        print(f'[Inpaint] Parameterized inpaint is disabled.')
-                    if inpaint_additional_prompt != '':
-                        if prompt == '':
-                            prompt = inpaint_additional_prompt
-                        else:
-                            prompt = inpaint_additional_prompt + '\n' + prompt
-                    goals.append('inpaint')
             if current_tab == 'ip' or \
                     advanced_parameters.mixing_image_prompt_and_inpaint or \
                     advanced_parameters.mixing_image_prompt_and_vary_upscale:
@@ -472,8 +426,6 @@ def process_generate(async_task: QueueTask):
                 # positive_basic_workloads = [task_prompt]
                 negative_basic_workloads = remove_empty_str(negative_basic_workloads, default=task_negative_prompt)
                 print("*************************", task_prompt)
-                print("*************************", positive_basic_workloads)
-                print("*************************", task_extra_positive_prompts)
                 
 
                 tasks.append(dict(
@@ -493,7 +445,7 @@ def process_generate(async_task: QueueTask):
                 
             if use_expansion:
                 for i, t in enumerate(tasks):
-                    progressbar(async_task, 5, f'Preparing Fooocus text #{i + 1} ...')
+                    progressbar(async_task, 5, f'Preparing BTGen text #{i + 1} ...')
                     expansion = pipeline.final_expansion(t['task_prompt'], t['task_seed'])
                     t['expansion'] = expansion
                     t['positive'] = copy.deepcopy(t['positive']) + [expansion]  # Deep copy.
@@ -610,114 +562,6 @@ def process_generate(async_task: QueueTask):
             width = W * 8
             height = H * 8
             print(f'Final resolution is {str((height, width))}.')
-
-        if 'inpaint' in goals:
-            if len(outpaint_selections) > 0:
-                H, W, C = inpaint_image.shape
-                if 'top' in outpaint_selections:
-                    distance_top = int(H * 0.3)
-                    if outpaint_distance_top > 0:
-                        distance_top = outpaint_distance_top
-
-                    inpaint_image = np.pad(inpaint_image, [[distance_top, 0], [0, 0], [0, 0]], mode='edge')
-                    inpaint_mask = np.pad(inpaint_mask, [[distance_top, 0], [0, 0]], mode='constant',
-                                          constant_values=255)
-                
-                if 'bottom' in outpaint_selections:
-                    distance_bottom = int(H * 0.3)
-                    if outpaint_distance_bottom > 0:
-                        distance_bottom = outpaint_distance_bottom
-
-                    inpaint_image = np.pad(inpaint_image, [[0, distance_bottom], [0, 0], [0, 0]], mode='edge')
-                    inpaint_mask = np.pad(inpaint_mask, [[0, distance_bottom], [0, 0]], mode='constant',
-                                          constant_values=255)
-
-                H, W, C = inpaint_image.shape
-                if 'left' in outpaint_selections:
-                    distance_left = int(W * 0.3)
-                    if outpaint_distance_left > 0:
-                        distance_left = outpaint_distance_left
-                    
-                    inpaint_image = np.pad(inpaint_image, [[0, 0], [distance_left, 0], [0, 0]], mode='edge')
-                    inpaint_mask = np.pad(inpaint_mask, [[0, 0], [distance_left, 0]], mode='constant',
-                                          constant_values=255)
-                
-                if 'right' in outpaint_selections:
-                    distance_right = int(W * 0.3)
-                    if outpaint_distance_right > 0:
-                        distance_right = outpaint_distance_right
-                    
-                    inpaint_image = np.pad(inpaint_image, [[0, 0], [0, distance_right], [0, 0]], mode='edge')
-                    inpaint_mask = np.pad(inpaint_mask, [[0, 0], [0, distance_right]], mode='constant',
-                                          constant_values=255)
-                    
-                inpaint_image = np.ascontiguousarray(inpaint_image.copy())
-                inpaint_mask = np.ascontiguousarray(inpaint_mask.copy())
-                advanced_parameters.inpaint_strength = 1.0
-                advanced_parameters.inpaint_respective_field = 1.0
-
-            denoising_strength = advanced_parameters.inpaint_strength
-
-            inpaint_worker.current_task = inpaint_worker.InpaintWorker(
-                image=inpaint_image,
-                mask=inpaint_mask,
-                use_fill=denoising_strength > 0.99,
-                k=advanced_parameters.inpaint_respective_field
-            )
-
-            if advanced_parameters.debugging_inpaint_preprocessor:
-                yield_result(async_task, inpaint_worker.current_task.visualize_mask_processing(),
-                             do_not_show_finished_images=True)
-                return
-
-            progressbar(async_task, 13, 'VAE Inpaint encoding ...')
-
-            inpaint_pixel_fill = core.numpy_to_pytorch(inpaint_worker.current_task.interested_fill)
-            inpaint_pixel_image = core.numpy_to_pytorch(inpaint_worker.current_task.interested_image)
-            inpaint_pixel_mask = core.numpy_to_pytorch(inpaint_worker.current_task.interested_mask)
-
-            candidate_vae, candidate_vae_swap = pipeline.get_candidate_vae(
-                steps=steps,
-                switch=switch,
-                denoise=denoising_strength,
-                refiner_swap_method=refiner_swap_method
-            )
-
-            latent_inpaint, latent_mask = core.encode_vae_inpaint(
-                mask=inpaint_pixel_mask,
-                vae=candidate_vae,
-                pixels=inpaint_pixel_image)
-
-            latent_swap = None
-            if candidate_vae_swap is not None:
-                progressbar(async_task, 13, 'VAE SD15 encoding ...')
-                latent_swap = core.encode_vae(
-                    vae=candidate_vae_swap,
-                    pixels=inpaint_pixel_fill)['samples']
-
-            progressbar(async_task, 13, 'VAE encoding ...')
-            latent_fill = core.encode_vae(
-                vae=candidate_vae,
-                pixels=inpaint_pixel_fill)['samples']
-
-            inpaint_worker.current_task.load_latent(
-                latent_fill=latent_fill, latent_mask=latent_mask, latent_swap=latent_swap)
-
-            if inpaint_parameterized:
-                pipeline.final_unet = inpaint_worker.current_task.patch(
-                    inpaint_head_model_path=inpaint_head_model_path,
-                    inpaint_latent=latent_inpaint,
-                    inpaint_latent_mask=latent_mask,
-                    model=pipeline.final_unet
-                )
-
-            if not advanced_parameters.inpaint_disable_initial_latent:
-                initial_latent = {'samples': latent_fill}
-
-            B, C, H, W = latent_fill.shape
-            height, width = H * 8, W * 8
-            final_height, final_width = inpaint_worker.current_task.image.shape[:2]
-            print(f'Final resolution is {str((final_height, final_width))}, latent is {str((height, width))}.')
 
         if 'cn' in goals:
             for task in cn_tasks[flags.cn_canny]:
@@ -863,6 +707,15 @@ def process_generate(async_task: QueueTask):
 
                 if inpaint_worker.current_task is not None:
                     imgs = [inpaint_worker.current_task.post_process(x) for x in imgs]
+                censeredImages = []
+                for index, x in enumerate(imgs):
+                    print(" ------------- before nsfw --------------------")
+                    if True:
+                        censeredImages.append(x)
+                    else:
+                        print(" ----------------- nsfw detected --------------------")
+                    print(" ------------- after nsfw --------------------")
+                imgs = censeredImages                    
                 for index, x in enumerate(imgs):
                     if deep_upscale:
                         tmp = perform_upscale(x)

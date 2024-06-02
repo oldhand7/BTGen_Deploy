@@ -7,16 +7,16 @@ default_inpaint_engine_version = 'v2.6'
 
 
 default_styles = ['Fooocus V2', 'Fooocus Enhance', 'Fooocus Sharp']
-default_base_model_name = 'juggernautXL_v8Rundiffusion.safetensors'
+default_base_model_name = 'JuggernautXRundiffusion_Hyper.safetensors'
 default_refiner_model_name = 'None'
-default_refiner_switch = 0.5
+default_refiner_switch = 0.4
 default_loras = [['sd_xl_offset_example-lora_1.0.safetensors', 0.1]]
 default_cfg_scale = 4.0
 default_prompt_positive = ', on a full-length body '
 default_prompt_negative = ' Two-piece, Bikini briefs, Monokini, Tankini, Triangle bikini, Bandeau bikini,Halter-neck bikini, High-waisted bikini, naked,naked, bachelorette, underwearing, underweared, nuke, nudity, bachelor, bottomless, underwear, bikini ,  bikini ,  bikini ,  bikini ,  bikini ,  bikini , topless,underwearing, underweared,underwearing, underweared, sexy, around current clothing,'
 default_aspect_ratio = '700*980'
-default_sampler = 'dpmpp_2m_sde_gpu'
-default_scheduler = 'karras'
+default_sampler = 'euler_ancestral'
+default_scheduler = 'ddim_uniform'
 
 
 available_aspect_ratios = [
