@@ -146,7 +146,7 @@ class NudeDetector:
         detections = self.detect(image_path)
         isNSFW = False
         for detection in detections:
-            if detection['class'] == 'FEMALE_BREAST_EXPOSED' or detection['class'] == 'FEMALE_GENITALIA_EXPOSED' or detection["class"] =="BELLY_EXPOSED" or detection["class"] == "ANUS_EXPOSED":
+            if detection['class'] == 'FEMALE_BREAST_EXPOSED' or detection['class'] == 'FEMALE_GENITALIA_EXPOSED' or detection["class"] =="BELLY_EXPOSED" or detection["class"] == "ANUS_EXPOSED" or detection["class"] == "BUTTOCKS_EXPOSED":
                 isNSFW = True
         return isNSFW
     
@@ -174,7 +174,6 @@ class NudeDetector:
         return output_path
 
 
-if __name__ == "__main__":
-    detector = NudeDetector()
-    detections = detector.detect("/home/administrator/BTGen/API/final/BTGen_Deploy/btgenapi/0eb32aec-acb5-4585-a9c9-e0d25d3d92de.png")
-    print("detections -> ",detections)
+# if __name__ == "__main__":
+#     detector = NudeDetector()
+#     detections = detector.detect("/Users/praneeth.bedapudi/Desktop/images.jpeg")

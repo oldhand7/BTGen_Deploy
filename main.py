@@ -252,6 +252,8 @@ def prepare_environments(args) -> bool:
 
     import modules.config as config
     import btgenapi.parameters as parameters
+    from btgenapi.nsfw.nudenet import NudeDetector
+
     parameters.default_inpaint_engine_version = config.default_inpaint_engine_version
     parameters.default_styles = config.default_styles
     parameters.default_base_model_name = config.default_base_model_name
@@ -260,7 +262,7 @@ def prepare_environments(args) -> bool:
     parameters.default_loras = config.default_loras
     parameters.default_cfg_scale = config.default_cfg_scale
     parameters.default_prompt_negative = config.default_prompt_negative
-    parameters.default_aspect_ratio = "832*1216"
+    parameters.default_aspect_ratio = "768*1280"
     parameters.available_aspect_ratios = [parameters.get_aspect_ratio_value(a) for a in config.available_aspect_ratios]
 
     # download_models()
@@ -273,6 +275,7 @@ def prepare_environments(args) -> bool:
     from btgenapi.task_queue import TaskQueue
     worker.worker_queue = TaskQueue(queue_size=args.queue_size, hisotry_size=args.queue_history, webhook_url=args.webhook_url, persistent=args.persistent)
 
+    worker.nudeDetector = NudeDetector()
     return True
 
 

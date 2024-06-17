@@ -17,13 +17,12 @@ def save_output_file(img: np.ndarray) -> str:
     current_time = datetime.datetime.now()
     date_string = current_time.strftime("%Y-%m-%d")
 
-    filename = os.path.join(date_string, str(uuid.uuid4()) + '.png')
+    filename = os.path.join(date_string, str(uuid.uuid4()) + '.webp')
     file_path = os.path.join(output_dir, filename)
 
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    Image.fromarray(img).save(file_path)
+    Image.fromarray(img).save(file_path, format='WEBP')
     return filename
-
 
 def delete_output_file(filename: str):
     file_path = os.path.join(output_dir, filename)

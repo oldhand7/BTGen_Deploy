@@ -176,7 +176,7 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
 
     for item_result in tmp:
         result_url = item_result.url
-        remote_url = result_url.replace("127.0.0.1:8887", vps_ip + ":8887")
+        remote_url = result_url.replace("http://127.0.0.1:8887", "https://" + vps_ip + ":9999")
         item_result.url = remote_url
         callback_payload_images.append({"url": remote_url, "prompt": rawreq.longPrompt})
         result.append(item_result)
@@ -192,7 +192,7 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
                     "isUserInput": rawreq.isUserInput
                 }
             }
-        }
+        }   
 
         # Define the headers
         headers = {
@@ -212,7 +212,7 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
 
         # Send the HTTP request using the `requests` library
         print("before request")
-        print(url)
+        print(url, graphql_request)
         requests.post(url, json=graphql_request, headers=headers)
 
         print("after request")
@@ -246,9 +246,6 @@ def generate_work(rawreq: SimpleText2ImgRequestWithPrompt):
 
     return result
 
-# def text_to_img_with_up_proc(req: Text2ImgRequestWithPromptMulti,
-#                         accept: str = Header(None),
-#                         accept_query: str | None = Query(None, alias='accept', description="Parameter to overvide 'Accept' header, 'image/png' for output bytes")):
 app.mount("/files", StaticFiles(directory=file_utils.output_dir), name="files")
                             
 
@@ -265,15 +262,15 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
         if accept_query is not None and len(accept_query) > 0:
             accept = accept_query
         result = []
-        for text_prompt in req.text_prompts:
+        for index, text_prompt in enumerate(req.text_prompts):
             callback_payload_images = []
+ 
             req.prompt = text_prompt
             tmp = generate_work(req)
-            print(" -----------------  tmp -----------------", tmp)
             for item_result in tmp:
                 result.append(item_result)
                 result_url = item_result.url
-                remote_url = result_url.replace("127.0.0.1:8887", vps_ip + ":8887")
+                remote_url = result_url.replace("http://127.0.0.1:8887", "https://" + vps_ip + ":9999")
                 item_result.url = remote_url
                 callback_payload_images.append({"url": remote_url, "prompt": text_prompt})
             try:
@@ -283,10 +280,14 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
                     "variables": {
                         "data": {
                             "images":callback_payload_images,
-                            "isUserInput": req.isUserInput
+                            "isUserInput": req.isUserInput,
+                            "isMore": index < len(req.text_prompts) - 1
                         }
                     }
                 }
+                print(" ----------------  graphql request -------------")
+                print(graphql_request)
+                print(" ----------------  graphql request -------------")
 
                 # Define the headers
                 headers = {
@@ -305,12 +306,13 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
                 # url = "https://graphql.beautifultechnologies.app/"
 
                 # Send the HTTP request using the `requests` library
-                # response = requests.post(url, json=graphql_request, headers=headers)
+                print(graphql_request)
+                response = requests.post(url, json=graphql_request, headers=headers)
                 print(" ------------------ after request to graphql -----------")
 
                 # Print the response content and status code
-                # print(response.content)
-                # print(response.status_code)
+                print(response.content)
+                print(response.status_code)
             except Exception as e:
 
                 print(e)

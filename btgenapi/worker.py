@@ -205,12 +205,12 @@ def process_generate(async_task: QueueTask):
 
         assert performance_selection in ['Speed', 'Quality', 'Extreme Speed']
 
-        steps = 6
+        steps = 15
         
-        performance_selection = 'HyperSD'
+        # performance_selection = 'Turbo Speed'
 
         if performance_selection == 'Speed':
-            steps = 6
+            steps = 15
 
         if performance_selection == 'Quality':
             steps = 60
@@ -227,34 +227,13 @@ def process_generate(async_task: QueueTask):
             sampler_name = advanced_parameters.sampler_name = 'lcm'
             scheduler_name = advanced_parameters.scheduler_name = 'lcm'
             patch.sharpness = sharpness = 0.0
-            cfg_scale = guidance_scale = 2.0
-            patch.adaptive_cfg = advanced_parameters.adaptive_cfg = 1.0
-            refiner_switch = 1.0
-            patch.positive_adm_scale = advanced_parameters.adm_scaler_positive = 1.0
-            patch.negative_adm_scale = advanced_parameters.adm_scaler_negative = 1.0
-            patch.adm_scaler_end = advanced_parameters.adm_scaler_end = 0.0
-            steps = 6
-            
-        elif performance_selection == "HyperSD":
-            print('Enter Hyper-SD mode.')
-            progressbar(async_task, 1, 'Downloading Hyper-SD components ...')
-            loras += [(config.downloading_sdxl_hyper_sd_lora(), 0.8)]
-
-            if refiner_model_name != 'None':
-                print(f'Refiner disabled in Hyper-SD mode.')
-            refiner_model_name = 'None'
-            sampler_name = advanced_parameters.sampler_name = 'dpmpp_sde_gpu'
-            scheduler_name = advanced_parameters.scheduler_name = 'karras'
-            patch.sharpness = sharpness = 0.0
             cfg_scale = guidance_scale = 1.0
             patch.adaptive_cfg = advanced_parameters.adaptive_cfg = 1.0
             refiner_switch = 1.0
             patch.positive_adm_scale = advanced_parameters.adm_scaler_positive = 1.0
             patch.negative_adm_scale = advanced_parameters.adm_scaler_negative = 1.0
             patch.adm_scaler_end = advanced_parameters.adm_scaler_end = 0.0
-            
-            
-
+            steps = 8
 
         patch.adaptive_cfg = advanced_parameters.adaptive_cfg
         print(f'[Parameters] Adaptive CFG = {patch.adaptive_cfg}')
@@ -323,10 +302,10 @@ def process_generate(async_task: QueueTask):
                     if 'fast' in uov_method:
                         skip_prompt_processing = True
                     else:
-                        steps = 6
+                        steps = 18
 
                         if performance_selection == 'Speed':
-                            steps = 6
+                            steps = 18
 
                         if performance_selection == 'Quality':
                             steps = 36
@@ -710,10 +689,11 @@ def process_generate(async_task: QueueTask):
                 censeredImages = []
                 for index, x in enumerate(imgs):
                     print(" ------------- before nsfw --------------------")
-                    if True:
+                    if nudeDetector.isNSFW(x) == False:
                         censeredImages.append(x)
                     else:
                         print(" ----------------- nsfw detected --------------------")
+                        print(x)
                     print(" ------------- after nsfw --------------------")
                 imgs = censeredImages                    
                 for index, x in enumerate(imgs):

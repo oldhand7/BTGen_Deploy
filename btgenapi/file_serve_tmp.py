@@ -1,4 +1,3 @@
-
 import uvicorn
 
 from typing import List, Optional
@@ -9,7 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 from asyncio import Lock, Semaphore
 import os
-
 
 app = FastAPI()
 
@@ -25,7 +23,7 @@ output_dir = os.path.abspath(os.path.join(
 app.mount("/files", StaticFiles(directory=output_dir), name="files")
                             
 def start_file_serve():
-    uvicorn.run("btgenapi.file_serve:app", host="0.0.0.0",port=9999, 
+    uvicorn.run("btgenapi.file_serve:app", host="0.0.0.0",port=9000, 
                 ssl_keyfile="key.pem", 
                 ssl_certfile="cert.pem", 
                 log_level="info")
