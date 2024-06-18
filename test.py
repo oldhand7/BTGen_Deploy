@@ -19,13 +19,10 @@ headers = {
     "Authorization": "Bearer 7fef7255-e7c9-4b48-a96d-26c08e1b58c0",
     "Cookie": "jgb_cs=s%3A96Q5_rfHS3EaRCEV6iKlsX7u_zm4naZD.yKB%2BJ35mmaGGryviAAagXeCrvkyAC9K4rCLjc4Xzd8c"
 }
-
 # Define the GraphQL API endpoint
 url = "https://stage-graphql.beautifultechnologies.app/"
-
 # Send the HTTP request using the `requests` library
 response = requests.post(url, json=graphql_request, headers=headers)
-
 # Print the response content and status code
 print(response.content)
 print(response.status_code)
