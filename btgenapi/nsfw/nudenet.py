@@ -139,7 +139,7 @@ class NudeDetector:
         )
         outputs = self.onnx_session.run(None, {self.input_name: preprocessed_image})
         detections = _postprocess(outputs, resize_factor, pad_left, pad_top)
-
+        
         return detections
 # [{'class': 'FACE_FEMALE', 'score': 0.7923867702484131, 'box': [320, 123, 115, 109]}, {'class': 'FEMALE_BREAST_EXPOSED', 'score': 0.7592489719390869, 'box': [357, 326, 127, 119]}, {'class': 'ARMPITS_EXPOSED', 'score': 0.6485426425933838, 'box': [286, 338, 63, 83]}, {'class': 'FEMALE_BREAST_EXPOSED', 'score': 0.565694272518158, 'box': [461, 290, 87, 118]}, {'class': 'BELLY_EXPOSED', 'score': 0.5116525292396545, 'box': [413, 460, 87, 157]}, {'class': 'FEET_COVERED', 'score': 0.4714394807815552, 'box': [142, 1144, 143, 72]}, {'class': 'BUTTOCKS_EXPOSED', 'score': 0.34870514273643494, 'box': [284, 554, 66, 156]}]
     def isNSFW(self, image_path):

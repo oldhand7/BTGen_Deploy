@@ -26,5 +26,4 @@ app.mount("/files", StaticFiles(directory=output_dir), name="files")
                             
 def start_file_serve():
     uvicorn.run("btgenapi.file_serve:app", host="0.0.0.0",port=9999, 
-
                 log_level="info")
