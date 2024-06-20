@@ -274,7 +274,7 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
                 result.append(item_result)
                 result_url = item_result.url
                 if file_https_serve == True:
-                    remote_url = result_url.replace("http://127.0.0.1:8887", "https://" + vps_ip + ":9999")
+                    remote_url = result_url.replace("http://127.0.0.1:8887/", "https://aiimg.beautifultechnologies.app/")
                 else: 
                     remote_url = result_url.replace("127.0.0.1:8887", vps_ip + ":9999")
                 item_result.url = remote_url
