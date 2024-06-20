@@ -21,7 +21,7 @@ from modules.util import HWC3
 from btgenapi.remote_utils import get_public_ip
 app = FastAPI()
 semaphore = Semaphore(1)
-file_https_serve = False
+file_https_serve = True
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow access from all sources
@@ -177,7 +177,7 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
     for item_result in tmp:
         result_url = item_result.url
         if file_https_serve == True:
-            remote_url = result_url.replace("http://127.0.0.1:8887", "https://" + vps_ip + ":9999")
+            remote_url = result_url.replace("http://127.0.0.1:8887/", "https://aiimg.beautifultechnologies.app/")
         else:
             remote_url = result_url.replace("127.0.0.1:8887", vps_ip + ":9999")
         item_result.url = remote_url
