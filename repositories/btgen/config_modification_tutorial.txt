@@ -1,20 +1,20 @@
-You can modify your "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/config.txt" using the below keys, formats, and examples.
+You can modify your "/home/administrator/BTGen_Deploy/repositories/btgen/config.txt" using the below keys, formats, and examples.
 Do not modify this file. Modifications in this file will not take effect.
-This file is a tutorial and example. Please edit "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/config.txt" to really change any settings.
+This file is a tutorial and example. Please edit "/home/administrator/BTGen_Deploy/repositories/btgen/config.txt" to really change any settings.
 Remember to split the paths with "\\" rather than "\", and there is no "," before the last "}". 
 
 
 {
-    "path_checkpoints": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/checkpoints",
-    "path_loras": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/loras",
-    "path_embeddings": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/embeddings",
-    "path_vae_approx": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/vae_approx",
-    "path_upscale_models": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/upscale_models",
-    "path_inpaint": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/inpaint",
-    "path_controlnet": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/controlnet",
-    "path_clip_vision": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/clip_vision",
-    "path_btgen_expansion": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/models/prompt_expansion/btgen_expansion",
-    "path_outputs": "/home/administrator/BTGen/API/final/BTGen_Deploy/repositories/btgen/outputs",
+    "path_checkpoints": "/home/administrator/BTGen_Deploy/repositories/btgen/models/checkpoints",
+    "path_loras": "/home/administrator/BTGen_Deploy/repositories/btgen/models/loras",
+    "path_embeddings": "/home/administrator/BTGen_Deploy/repositories/btgen/models/embeddings",
+    "path_vae_approx": "/home/administrator/BTGen_Deploy/repositories/btgen/models/vae_approx",
+    "path_upscale_models": "/home/administrator/BTGen_Deploy/repositories/btgen/models/upscale_models",
+    "path_inpaint": "/home/administrator/BTGen_Deploy/repositories/btgen/models/inpaint",
+    "path_controlnet": "/home/administrator/BTGen_Deploy/repositories/btgen/models/controlnet",
+    "path_clip_vision": "/home/administrator/BTGen_Deploy/repositories/btgen/models/clip_vision",
+    "path_btgen_expansion": "/home/administrator/BTGen_Deploy/repositories/btgen/models/prompt_expansion/btgen_expansion",
+    "path_outputs": "/home/administrator/BTGen_Deploy/repositories/btgen/outputs",
     "default_model": "juggernautXL_v8Rundiffusion.safetensors",
     "previous_default_models": [
         "juggernautXL_version8Rundiffusion.safetensors",

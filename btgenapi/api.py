@@ -177,7 +177,7 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
     for item_result in tmp:
         result_url = item_result.url
         if file_https_serve == True:
-            remote_url = result_url.replace("http://127.0.0.1:8887/", "https://aiimg.beautifultechnologies.app/")
+            remote_url = result_url.replace("http://127.0.0.1:8887/files/", "")
         else:
             remote_url = result_url.replace("127.0.0.1:8887", vps_ip + ":9999")
         item_result.url = remote_url
@@ -267,14 +267,14 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
         result = []
         for index, text_prompt in enumerate(req.text_prompts):
             callback_payload_images = []
- 
+
             req.prompt = text_prompt
             tmp = generate_work(req)
             for item_result in tmp:
                 result.append(item_result)
                 result_url = item_result.url
                 if file_https_serve == True:
-                    remote_url = result_url.replace("http://127.0.0.1:8887/", "https://aiimg.beautifultechnologies.app/")
+                    remote_url = result_url.replace("http://127.0.0.1:8887/files/", "")
                 else: 
                     remote_url = result_url.replace("127.0.0.1:8887", vps_ip + ":9999")
                 item_result.url = remote_url

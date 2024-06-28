@@ -7,7 +7,7 @@ import re
 import logging
 
 from typing import List
-from btgenapi.file_utils import save_output_file
+from btgenapi.file_utils import save_output_file, ndarray_to_base64
 from btgenapi.parameters import GenerationFinishReason, ImageGenerationResult, default_prompt_positive, default_prompt_negative
 from btgenapi.task_queue import QueueTask, TaskQueue, TaskOutputs
 import cv2
@@ -114,8 +114,8 @@ def process_generate(async_task: QueueTask):
         results = []
         for i, im in enumerate(imgs):
             seed = -1 if len(tasks) == 0 else tasks[i]['task_seed']
-            img_filename = save_output_file(im)
-            results.append(ImageGenerationResult(im=img_filename, seed=str(seed), finish_reason=GenerationFinishReason.success))
+            image = ndarray_to_base64(im)
+            results.append(ImageGenerationResult(im=image, seed=str(seed), finish_reason=GenerationFinishReason.success))
         async_task.set_result(results, False)
         worker_queue.finish_task(async_task.job_id)
         print(f"[Task Queue] Finish task, job_id={async_task.job_id}")

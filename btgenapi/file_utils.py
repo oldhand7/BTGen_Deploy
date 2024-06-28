@@ -13,6 +13,29 @@ os.makedirs(output_dir, exist_ok=True)
 static_serve_base_url = 'http://127.0.0.1:8887/files/'
 
 
+def ndarray_to_base64(image_array):
+    """
+    Convert a numpy ndarray representing an image into a base64-encoded string.
+    
+    Parameters:
+    image_array (np.ndarray): The numpy array representing the image.
+
+    Returns:
+    str: The base64-encoded string of the image.
+    """
+    # Convert numpy array to PIL Image
+    image = Image.fromarray(image_array)
+    
+    # Save PIL Image to a bytes buffer
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    buffer.seek(0)
+    
+    # Encode the bytes buffer into base64
+    image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    
+    return image_base64
+
 def save_output_file(img: np.ndarray) -> str:
     current_time = datetime.datetime.now()
     date_string = current_time.strftime("%Y-%m-%d")
