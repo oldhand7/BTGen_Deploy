@@ -172,6 +172,9 @@ def req_to_params(req: Text2ImgRequest) -> ImageGenerationParams:
                                  image_prompts=image_prompts,
                                  advanced_params=advanced_params,
                                  require_base64=req.require_base64,
+                                 apiToken=req.apiToken,
+                                 apiEnv=req.apiEnv,
+                                 isMore=req.isMore
                                  )
 
 

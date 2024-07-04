@@ -176,4 +176,5 @@ class NudeDetector:
 
 # if __name__ == "__main__":
 #     detector = NudeDetector()
-#     detections = detector.detect("/Users/praneeth.bedapudi/Desktop/images.jpeg")
+#     detections = detector.detect("/home/administrator/BTGen/BTGen_Deploy/btgenapi/nsfw/0eb32aec-acb5-4585-a9c9-e0d25d3d92de.png")
+#     print(detections)
