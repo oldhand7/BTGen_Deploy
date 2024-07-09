@@ -203,7 +203,8 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Authorization": "Bearer " + gToken,
-            "Cookie": "jgb_cs=s%3A96Q5_rfHS3EaRCEV6iKlsX7u_zm4naZD.yKB%2BJ35mmaGGryviAAagXeCrvkyAC9K4rCLjc4Xzd8c"
+            "Cookie": "jgb_cs=s%3A96Q5_rfHS3EaRCEV6iKlsX7u_zm4naZD.yKB%2BJ35mmaGGryviAAagXeCrvkyAC9K4rCLjc4Xzd8c",
+                     "x-real-ip": vps_ip
         }
 
         # Define the GraphQL API endpoint for staging
