@@ -193,7 +193,6 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
                 "data": {
                     "images":callback_payload_images,
                     "isUserInput": rawreq.isUserInput,
-                    "x-real-ip": vps_ip
                 }
             }
         }   
