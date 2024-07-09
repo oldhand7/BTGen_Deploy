@@ -192,7 +192,8 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
             "variables": {
                 "data": {
                     "images":callback_payload_images,
-                    "isUserInput": rawreq.isUserInput
+                    "isUserInput": rawreq.isUserInput,
+                    "x-real-ip": vps_ip
                 }
             }
         }   
@@ -292,7 +293,6 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
                     }
                 }
                 print(" ----------------  graphql request -------------")
-                print(graphql_request)
                 print(" ----------------  graphql request -------------")
 
                 # Define the headers
@@ -300,7 +300,8 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
                     "Content-Type": "application/json",
                     "Accept": "application/json",
                     "Authorization": "Bearer " + gToken,
-                    "Cookie": "jgb_cs=s%3A96Q5_rfHS3EaRCEV6iKlsX7u_zm4naZD.yKB%2BJ35mmaGGryviAAagXeCrvkyAC9K4rCLjc4Xzd8c"
+                    "Cookie": "jgb_cs=s%3A96Q5_rfHS3EaRCEV6iKlsX7u_zm4naZD.yKB%2BJ35mmaGGryviAAagXeCrvkyAC9K4rCLjc4Xzd8c",
+                     "x-real-ip": vps_ip
                 }
 
                 # Define the GraphQL API endpoint for staging
@@ -312,12 +313,10 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
                 # url = "https://graphql.beautifultechnologies.app/"
 
                 # Send the HTTP request using the `requests` library
-                print(graphql_request)
                 response = requests.post(url, json=graphql_request, headers=headers)
                 print(" ------------------ after request to graphql -----------")
 
                 # Print the response content and status code
-                print(response.content)
                 print(response.status_code)
             except Exception as e:
 
