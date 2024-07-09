@@ -170,7 +170,6 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
 
     result = []
     tmp = call_worker(req, "application/json")
-    print("---- call worker finished ----", tmp)
 
     callback_payload_images = []
 
@@ -184,7 +183,6 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
         callback_payload_images.append({"url": remote_url, "prompt": rawreq.longPrompt})
         result.append(item_result)
 
-    print(" --------- post processing the urls -----------" , result)
     try:
         # Define the GraphQL query and variables as a dictionary
         graphql_request = {
@@ -223,7 +221,6 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
     except Exception as e:
         print(e)
     print(" --------------- return result ----------")
-    print(result)
     print ( "----------------" )
     return result
 
