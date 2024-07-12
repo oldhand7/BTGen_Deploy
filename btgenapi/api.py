@@ -149,7 +149,7 @@ def text_to_img_with_ip(rawreq: SimpleText2ImgRequestWithPrompt,
 def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
                         accept: str = Header(None),
                         accept_query: str | None = Query(None, alias='accept', description="Parameter to overvide 'Accept' header, 'image/png' for output bytes")):
-    
+    queueId = rawreq.queueId
     gToken = rawreq.token
     if accept_query is not None and len(accept_query) > 0:
         accept = accept_query
@@ -190,6 +190,7 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
             "variables": {
                 "data": {
                     "images":callback_payload_images,
+                            "queueId": queueId,
                     "isUserInput": rawreq.isUserInput,
                 }
             }
@@ -259,7 +260,7 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
     async with lock:
         print(" -------------------------------------------- text-to-image-with-ip-multi -----------------")
         gToken = req.token
-
+        queueId = req.queueId
         if accept_query is not None and len(accept_query) > 0:
             accept = accept_query
         result = []
@@ -285,6 +286,7 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
                         "data": {
                             "images":callback_payload_images,
                             "isUserInput": req.isUserInput,
+                            "queueId": queueId,
                             "isMore": index < len(req.text_prompts) - 1
                         }
                     }
