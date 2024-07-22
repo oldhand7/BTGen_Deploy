@@ -25,6 +25,7 @@ class ImgPromptRequestJson(ImgInpaintOrOutpaintRequestJson):
 class SimpleText2ImgRequestWithPrompt(BaseModel):
     prompt: str = ''
     image_number: int = 10
+    isDaily: bool = False
     image_prompts: List[str] = []
     token: str = ''
     deep_upscale: bool = False
@@ -34,6 +35,7 @@ class LongText2ImgRequestWithPrompt(BaseModel):
     longPrompt: str = ''
     image_number: int = 10
     image_prompts: List[str] = []
+    isDaily: bool = False
     token: str = ''
     deep_upscale: bool = False
     isUserInput: bool = False

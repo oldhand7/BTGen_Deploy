@@ -192,6 +192,7 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
                     "images":callback_payload_images,
                             "queueId": queueId,
                     "isUserInput": rawreq.isUserInput,
+                    "isDaily": req.isDaily
                 }
             }
         }   
@@ -278,17 +279,19 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
                     remote_url = result_url.replace("127.0.0.1:8887", vps_ip + ":9999")
                 item_result.url = remote_url
                 callback_payload_images.append({"url": remote_url, "prompt": text_prompt})
-            try:
+            try:   
                 # Define the GraphQL query and variables as a dictionary
                 graphql_request = {
                     "query": "mutation UpdateImagesGeneration($data: ImageGenerationInput!) { updateImagesGeneration(data: $data) { status }}",
                     "variables": {
                         "data": {
+                            
                             "images":callback_payload_images,
-                            "isUserInput": req.isUserInput,
+                            "isUserInput": req.isUserInput, 
+                            "isDaily": req.isDaily,
                             "queueId": queueId,
                             "isMore": index < len(req.text_prompts) - 1
-                        }
+                        } 
                     }
                 }
                 print(" ----------------  graphql request -------------")
