@@ -5,25 +5,152 @@ import numpy as np
 import torch
 import re
 import logging
+from btgenapi.remote_utils import get_public_ip
+import base64
+from io import BytesIO
+from PIL import Image
 
 from typing import List
-from btgenapi.file_utils import save_output_file, ndarray_to_base64
+from btgenapi.file_utils import  ndarray_to_base64
 from btgenapi.parameters import GenerationFinishReason, ImageGenerationResult, default_prompt_positive, default_prompt_negative
 from btgenapi.task_queue import QueueTask, TaskQueue, TaskOutputs
 import cv2
-
+import json
+import uuid
+import requests
 from btgenapi.nsfw.nudenet import NudeDetector
 worker_queue: TaskQueue = None
 nudeDetector = None
 
 worker_queue: TaskQueue = None
 
+gToken= None
+isUserInput = False
+isDaily = False
+queueId = None
+env = "PROD"
+prompt = ""
+isLastPrompt = False
+vps_ip = get_public_ip()
 
-
-
+def update_variables(new_gToken, new_isUserInput, new_isDaily, new_queueId, new_env, new_prompt, new_isLastPrompt):
+    global gToken, isUserInput, isDaily, queueId, env, prompt, isLastPrompt
+    gToken = new_gToken
+    isLastPrompt = new_isLastPrompt
+    prompt = new_prompt
+    isUserInput = new_isUserInput
+    isDaily = new_isDaily
+    queueId = new_queueId
+    env = new_env
+    
+    
 def process_top():
     import ldm_patched.modules.model_management
     ldm_patched.modules.model_management.interrupt_current_processing()
+
+
+# def save_ndarray_to_json(array: np.ndarray, filename: str):
+#     # Convert the numpy array to a list
+#     array_list = array.tolist()
+    
+#     # Save the list to a JSON file
+#     with open(filename, 'w') as json_file:
+#         json.dump(array_list, json_file)
+        
+        
+
+
+def numpy_to_base64(numpy_array):
+    """
+    Converts a NumPy array to a base64 encoded string.
+    
+    Args:
+        numpy_array (numpy.ndarray): The input NumPy array.
+        
+    Returns:
+        str: The base64 encoded string.
+    """
+    # Create a PIL image from the NumPy array
+    image = Image.fromarray(numpy_array.astype(np.uint8))
+    
+    # Convert the PIL image to bytes
+    buffered = BytesIO()
+    image.save(buffered, format="PNG")
+    
+    # Encode the bytes to a base64 string
+    base64_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+    
+    return base64_str
+        
+def save_json_to_file(data, file_path):
+    """
+    Saves the given JSON data to a file.
+    
+    Args:
+        data (dict or list): The JSON data to be saved.
+        file_path (str): The path to the file where the data will be saved.
+    """
+    try:
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=4)
+        print(f"JSON data saved to: {file_path}")
+    except (IOError, ValueError) as e:
+        print(f"Error saving JSON data: {e}")
+        
+save_num = 1
+def graphql_request(img, isMore):
+    global save_num 
+    
+    try:   
+        # Define the GraphQL query and variables as a dictionary
+        print("==============================")
+        img_base64 = numpy_to_base64(img)
+        # save_ndarray_to_json(img, "bt_output.json")
+        print("==============================")
+        graphql_request = {
+            "query": "mutation UpdateImagesGeneration($data: ImageGenerationInput!) { updateImagesGeneration(data: $data) { status }}",
+            "variables": {
+                "data": {
+                    "images":[{"url":img_base64, "prompt": prompt}],
+                    "isUserInput": isUserInput, 
+                    "isDaily": isDaily,
+                    "queueId": queueId,
+                    "isMore": isMore
+                } 
+            }
+        }
+        # save_json_to_file(graphql_request, str(save_num) + ".json")
+        save_num = save_num + 1
+
+        # Define the headers
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer " + gToken,
+            "Cookie": "jgb_cs=s%3A96Q5_rfHS3EaRCEV6iKlsX7u_zm4naZD.yKB%2BJ35mmaGGryviAAagXeCrvkyAC9K4rCLjc4Xzd8c",
+                "x-real-ip": vps_ip
+        }
+
+        # Define the GraphQL API endpoint for staging
+        print(" ------------------ before request to graphql -----------")
+        print(isUserInput, isDaily, queueId, isMore, gToken,  env)
+        
+        url = "https://stage-graphql.beautifultechnologies.app/"
+        if env == "PROD": 
+            url = "https://graphql.beautifultechnologies.app/"
+        #Define the GraphQL API endpoint for production
+        # url = "https://graphql.beautifultechnologies.app/"
+
+        # Send the HTTP request using the `requests` library
+        response = requests.post(url, json=graphql_request, headers=headers)
+        print(" ------------------ after request to graphql -----------")
+
+        # Print the response content and status code
+        print(response.status_code)
+    except Exception as e:
+
+        print(e)
+
 
 
 @torch.no_grad()
@@ -700,6 +827,15 @@ def process_generate(async_task: QueueTask):
                     if deep_upscale:
                         tmp = perform_upscale(x)
                         imgs[index] = tmp
+                    isMore = False
+                    if current_task_id < len(tasks) - 1:
+                        isMore = True
+                    if isLastPrompt == False:
+                        isMore = True
+                        
+                    print("********************" , index, isMore)
+                    graphql_request(imgs[index], isMore)
+                    
                     d = [
                         ('Prompt', task['log_positive_prompt']),
                         ('Negative Prompt', task['log_negative_prompt']),
@@ -725,7 +861,6 @@ def process_generate(async_task: QueueTask):
                             d.append((f'LoRA', f'{n} : {w}'))
                     d.append(('Version', 'v0.0.1'))
                     log(x, d)
-
 
                 results += imgs
             except model_management.InterruptProcessingException as e:
