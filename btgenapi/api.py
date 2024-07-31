@@ -22,7 +22,13 @@ from modules.util import HWC3
 from btgenapi.remote_utils import get_public_ip
 app = FastAPI()
 semaphore = Semaphore(1)
+
 file_https_serve = True
+
+apiIsUserInput = False
+apiToken = ""
+apiEnv = "PROD"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow access from all sources
@@ -232,8 +238,11 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
     return result
 
 
-def generate_work(rawreq: SimpleText2ImgRequestWithPrompt): 
+def generate_work(rawreq: SimpleText2ImgRequestWithPrompt, apiToken, apiEnv, isMore): 
+    
     req = Text2ImgRequestWithPrompt()
+    req.apiEnv = apiEnv
+    req.apiToken = apiToken
     req.image_number = rawreq.image_number
     req.prompt = rawreq.prompt
     req.image_prompts = rawreq.image_prompts
@@ -249,7 +258,7 @@ def generate_work(rawreq: SimpleText2ImgRequestWithPrompt):
         image_prompts_files.append(default_image_promt)
 
     req.image_prompts = image_prompts_files
-
+    req.isMore = isMore
     result = call_worker(req, "application/json")
 
     return result
@@ -283,7 +292,8 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
             update_variables(req.token, req.isUserInput, req.isDaily, req.queueId, req.env, req.prompt, isLastPrompt)
             
             req.prompt = text_prompt
-            tmp = generate_work(req)
+            isMore = (index != len(req.text_prompts) - 1)
+            tmp = generate_work(req, gToken, req.env, isMore)
             for item_result in tmp:
                 result.append(item_result)
                 result_url = item_result.url

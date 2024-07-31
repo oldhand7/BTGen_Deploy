@@ -80,6 +80,7 @@ class ImageGenerationParams(object):
     def __init__(self, prompt: str,
                  isLongPrompt: bool,
                  isUserInput: bool,
+                 isMore: bool,
                  deep_upscale: bool,
                  negative_prompt: str,
                  style_selections: List[str],
@@ -105,8 +106,14 @@ class ImageGenerationParams(object):
                  inpaint_additional_prompt: str | None,
                  image_prompts: List[Tuple[np.ndarray, float, float, str]],
                  advanced_params: List[any] | None,
-                 require_base64: bool):
+                 require_base64: bool,
+                 apiEnv: str,
+                 apiToken: str
+                 ):
         self.prompt = prompt
+        self.apiEnv  = apiEnv
+        self.isMore = isMore
+        self.apiToken = apiToken
         self.isLongPrompt = isLongPrompt
         self.isUserInput = isUserInput
         self.deep_upscale = deep_upscale

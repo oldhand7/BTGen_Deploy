@@ -229,7 +229,7 @@ def process_generate(async_task: QueueTask):
             except ValueError:
                 pass
             return random.randint(constants.MIN_SEED, constants.MAX_SEED)
-        
+   
     def progressbar(_, number, text):
         print(f'[Fooocus] {text}')
         outputs.append(['preview', (number, text, None)])
@@ -250,6 +250,52 @@ def process_generate(async_task: QueueTask):
         outputs.append(['results', imgs])
         pipeline.prepare_text_encoder(async_call=True)
 
+     
+    def graphql_invoke(imgs, prompt, isMore):
+        try:
+            img = ndarray_to_base64(imgs[0])
+            print(isLongAPI, isMore, prompt, apiEnv, apiToken)
+
+            # Define the GraphQL query and variables as a dictionary
+            graphql_request = {
+                "query": "mutation UpdateImagesGeneration($data: ImageGenerationInput!) { updateImagesGeneration(data: $data) { status }}",
+                "variables": {
+                    "data": {
+                        "images":[{"url": [img], "prompt": prompt}],
+                        "isUserInput": isLongAPI,
+                        "isMore": isMore
+                    }
+                }
+            }
+            print(" ----------------  graphql request -------------")
+
+            # Define the headers
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer " + apiToken,
+                "Cookie": "jgb_cs=s%3A96Q5_rfHS3EaRCEV6iKlsX7u_zm4naZD.yKB%2BJ35mmaGGryviAAagXeCrvkyAC9K4rCLjc4Xzd8c"
+            }
+
+            # Define the GraphQL API endpoint for staging
+            url = "https://stage-graphql.beautifultechnologies.app/"
+            if apiEnv == "PROD": 
+                url = "https://graphql.beautifultechnologies.app/"
+            #Define the GraphQL API endpoint for production
+            # url = "https://graphql.beautifultechnologies.app/"
+
+            # Send the HTTP request using the `requests` library
+            response = requests.post(url, json=graphql_request, headers=headers)
+            print(" ------------------ after request to graphql -----------")
+
+            # Print the response content and status code
+            print(response.status_code)
+        except Exception as e:
+
+            print(e)
+
+
+
     try:
         print(f"[Task Queue] Task queue start task, job_id={async_task.job_id}")
         worker_queue.start_task(async_task.job_id)
@@ -260,6 +306,7 @@ def process_generate(async_task: QueueTask):
         params = async_task.req_param
 
         prompt ="(full length:1.4),(clothed:1.3), (best quality:1.2)  shod, " + params.prompt
+        original_prompt = params.prompt
         style_selections = params.style_selections
 
         performance_selection = params.performance_selection
@@ -285,9 +332,12 @@ def process_generate(async_task: QueueTask):
         inpaint_input_image = params.inpaint_input_image
         inpaint_additional_prompt = params.inpaint_additional_prompt
         deep_upscale = params.deep_upscale
+        apiEnv = params.apiEnv
+        isLongAPI = params.isLongPrompt
+        apiToken  = params.apiToken
         inpaint_mask_image_upload = None
         negative_prompt = default_prompt_negative
-
+        isMore = params.isMore
         if inpaint_additional_prompt is None:
             inpaint_additional_prompt = ''
 
@@ -808,7 +858,6 @@ def process_generate(async_task: QueueTask):
                     cfg_scale=cfg_scale,
                     refiner_swap_method=refiner_swap_method
                 )
-
                 del task['c'], task['uc'], positive_cond, negative_cond  # Save memory
 
                 if inpaint_worker.current_task is not None:
@@ -820,7 +869,6 @@ def process_generate(async_task: QueueTask):
                         censeredImages.append(x)
                     else:
                         print(" ----------------- nsfw detected --------------------")
-                        print(x)
                     print(" ------------- after nsfw --------------------")
                 imgs = censeredImages                    
                 for index, x in enumerate(imgs):

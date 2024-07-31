@@ -110,6 +110,11 @@ class AdvancedParams(BaseModel):
 
 class Text2ImgRequest(BaseModel):
     prompt: str = ''
+
+    apiToken:str = ""
+    apiEnv:str = "PROD"
+    isMore: bool = True
+    
     isLongPrompt: bool = False
     isUserInput: bool = False
     deep_upscale: bool = False
