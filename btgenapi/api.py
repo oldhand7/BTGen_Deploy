@@ -194,47 +194,6 @@ def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
         callback_payload_images.append({"url": remote_url, "prompt": rawreq.longPrompt})
         result.append(item_result)
 
-        # try:
-        #     # Define the GraphQL query and variables as a dictionary
-        #     graphql_request = {
-        #         "query": "mutation UpdateImagesGeneration($data: ImageGenerationInput!) { updateImagesGeneration(data: $data) { status }}",
-        #         "variables": {
-        #             "data": {
-        #                 "images":callback_payload_images,
-        #                         "queueId": queueId,
-        #                 "isUserInput": rawreq.isUserInput,
-        #                 "isDaily": req.isDaily
-        #             }
-        #         }
-        #     }   
-
-        #     # Define the headers
-        #     headers = {
-        #         "Content-Type": "application/json",
-        #         "Accept": "application/json",
-        #         "Authorization": "Bearer " + gToken,
-        #         "Cookie": "jgb_cs=s%3A96Q5_rfHS3EaRCEV6iKlsX7u_zm4naZD.yKB%2BJ35mmaGGryviAAagXeCrvkyAC9K4rCLjc4Xzd8c",
-        #                 "x-real-ip": vps_ip
-        #     }
-
-        #     # Define the GraphQL API endpoint for staging
-
-        #     url = "https://stage-graphql.beautifultechnologies.app/"
-        #     if rawreq.env == "PROD": 
-        #         url = "https://graphql.beautifultechnologies.app/"
-        #     #Define the GraphQL API endpoint for production
-        #     # url = "https://graphql.beautifultechnologies.app/"
-
-        #     # Send the HTTP request using the `requests` library
-        #     print("before request")
-        #     print(url, graphql_request)
-        #     requests.post(url, json=graphql_request, headers=headers)
-
-        #     print("after request")
-        # except Exception as e:
-        #     print(e)
-        # print(" --------------- return result ----------")
-        # print ( "----------------" )
     return result
 
 
