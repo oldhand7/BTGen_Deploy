@@ -30,6 +30,7 @@ class SimpleText2ImgRequestWithPrompt(BaseModel):
     token: str = ''
     deep_upscale: bool = False
     isUserInput: bool = False
+    activityId: str = ''
     queueId: str = ""
 class LongText2ImgRequestWithPrompt(BaseModel):
     longPrompt: str = ''
@@ -41,6 +42,7 @@ class LongText2ImgRequestWithPrompt(BaseModel):
     isUserInput: bool = False
     env: str = ''
     queueId: str = ''
+    activityId: str = ''
     
 
 class Text2ImgRequestWithPrompt(Text2ImgRequest):
