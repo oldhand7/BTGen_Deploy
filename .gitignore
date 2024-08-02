@@ -48,5 +48,6 @@ experiment.py
 /auth.json
 .cog/
 *.db
+/config_modification_tutorial.txt
 
-config_modification_tutorial.txt
+/repositories/btgen/config_modification_tutorial.txt
