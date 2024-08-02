@@ -153,7 +153,7 @@ def text_to_img_with_ip(rawreq: SimpleText2ImgRequestWithPrompt,
 def long_text_to_img_with_ip(rawreq: LongText2ImgRequestWithPrompt,
                         accept: str = Header(None),
                         accept_query: str | None = Query(None, alias='accept', description="Parameter to overvide 'Accept' header, 'image/png' for output bytes")):
-    update_variables(rawreq.token, rawreq.isUserInput, rawreq.isDaily, rawreq.queueId, rawreq.env, rawreq.longPrompt, True)
+    update_variables(rawreq.token, rawreq.isUserInput, rawreq.isDaily, rawreq.activityId, rawreq.queueId, rawreq.env, rawreq.longPrompt, True)
     queueId = rawreq.queueId
     gToken = rawreq.token
     if accept_query is not None and len(accept_query) > 0:
@@ -280,7 +280,7 @@ async def text_to_img_with_ip(req: Text2ImgRequestWithPromptMulti,
         for index, text_prompt in enumerate(req.text_prompts):
             callback_payload_images = []
             isLastPrompt = index == len(req.text_prompts) - 1
-            update_variables(req.token, req.isUserInput, req.isDaily, req.queueId, req.env, req.prompt, isLastPrompt)
+            update_variables(req.token, req.isUserInput, req.isDaily, req.activityId, req.queueId, req.env, req.prompt, isLastPrompt)
             
             req.prompt = text_prompt
             tmp = generate_work(req)

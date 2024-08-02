@@ -28,14 +28,16 @@ gToken= None
 isUserInput = False
 isDaily = False
 queueId = None
+activityId = None
 env = "PROD"
 prompt = ""
 isLastPrompt = False
 vps_ip = get_public_ip()
 
-def update_variables(new_gToken, new_isUserInput, new_isDaily, new_queueId, new_env, new_prompt, new_isLastPrompt):
-    global gToken, isUserInput, isDaily, queueId, env, prompt, isLastPrompt
+def update_variables(new_gToken, new_isUserInput, new_isDaily, new_activityId, new_queueId, new_env, new_prompt, new_isLastPrompt):
+    global gToken, isUserInput, isDaily, queueId, env, prompt, isLastPrompt, activityId
     gToken = new_gToken
+    activityId = new_activityId
     isLastPrompt = new_isLastPrompt
     prompt = new_prompt
     isUserInput = new_isUserInput
@@ -115,6 +117,7 @@ def graphql_request(img, isMore):
                     "isUserInput": isUserInput, 
                     "isDaily": isDaily,
                     "queueId": queueId,
+                    "activityId": activityId,
                     "isMore": isMore
                 } 
             }
